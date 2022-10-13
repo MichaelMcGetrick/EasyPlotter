@@ -1,0 +1,33 @@
+#Ignore text files
+*.txt
+#Ignore log files
+*.log
+#Ignore data files
+*.dat
+#Ignore csv files
+*.csv
+#Ignore csv files
+*.xls
+#Ignore bmp files
+*.bmp
+#Ignore wav files
+*.wav
+#Ignore IDE project files
+#*.dfm
+#*.bpr
+#*.def
+#*.dsk
+#Ignore executable and object files
+*.exe
+*.obj
+*.tds
+#Miscellaneous
+*.~*
+#Ignore directories
+AudioPlayer/
+Help/
+Ini/EasyPlotter.ori
+LinuxModule/
+RC_Filter_Averaging/
+Tiller/
+
