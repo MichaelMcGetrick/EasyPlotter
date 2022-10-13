@@ -225,7 +225,7 @@ __fastcall TEasyPlotForm::TEasyPlotForm(TComponent* Owner)
 #ifdef ORI_WIN_CODE
    StatusBar1->Panels->Items[1]->Text = "LEGACY WINDOWS CODE RUNNING";
 #else
-   StatusBar1->Panels->Items[1]->Text = "LINUX INTEGRATED CODE RUNNING";
+   StatusBar1->Panels->Items[1]->Text = "  LINUX INTEGRATED CODE RUNNING";
 #endif
 
 
