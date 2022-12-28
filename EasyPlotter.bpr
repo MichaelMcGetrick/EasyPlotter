@@ -16,7 +16,9 @@ VERSION = BCB.04.04
 PROJECT = EasyPlotter.exe
 OBJFILES = EasyPlotter.obj Easy.obj ..\class_library\floatvec.obj \
   ..\class_library\floatmat.obj ..\class_library\wavetool.obj graph.obj \
-  legend.obj ..\class_library\audiodev.obj ..\class_library\applaunch.obj movie.obj
+  legend.obj ..\class_library\audiodev.obj ..\class_library\applaunch.obj \
+  movie.obj a_shape.obj a_line.obj a_arrow.obj a_barplot.obj a_bitmap.obj \
+  a_circle.obj a_text.obj
 RESFILES = EasyPlotter.res
 RESDEPEN = $(RESFILES) Easy.dfm graph.dfm legend.dfm movie.dfm
 LIBFILES =

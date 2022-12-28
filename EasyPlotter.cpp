@@ -11,6 +11,13 @@ USEFORM("legend.cpp", SettingsDlg);
 USEUNIT("..\class_library\audiodev.cpp");
 USEUNIT("..\class_library\applaunch.cpp");
 USEFORM("movie.cpp", MovieForm);
+USEUNIT("a_shape.cpp");
+USEUNIT("a_line.cpp");
+USEUNIT("a_arrow.cpp");
+USEUNIT("a_barplot.cpp");
+USEUNIT("a_bitmap.cpp");
+USEUNIT("a_circle.cpp");
+USEUNIT("a_text.cpp");
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {

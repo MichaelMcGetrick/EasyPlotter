@@ -15,7 +15,7 @@
 A_Line::A_Line(int plotProc,char *plotType,TGraphForm *gph,std::vector<std::string> args,int aCnt)
 			  :A_Shape(plotProc,plotType,gph,args,aCnt)
 {
-
+      
 
 }//A_Line
 

@@ -202,12 +202,18 @@ __fastcall TGraphForm::TGraphForm(TComponent* Owner,
 
 
 
+
+
+
      //Draw line through origin:
      drawOriginLine();
 
      counter1 = 0.0;
      strcpy(xfield,"5.1");
      strcpy(yfield,"5.1");
+
+
+
      //Draw graduations:
      graduations();
      //Draw axis scales:
@@ -3942,8 +3948,6 @@ __fastcall TGraphForm::TGraphForm(TComponent* Owner,
    monoMode = true;
    image = 1;
 
-
-
    //Re-initialise to requested form dimensions:
    Height = formHeight;
    Width = formWidth;
@@ -3981,8 +3985,8 @@ __fastcall TGraphForm::TGraphForm(TComponent* Owner,
    ynoDivs = yInt;
 
    showGrid = grid;
-   showXGradLines = xshow;
-   showYGradLines = yshow;
+   showXGradLines = xGrad;
+   showYGradLines = yGrad;
 
 
    if(logPlotMode == 1)
@@ -5031,69 +5035,292 @@ void TGraphForm::drawVerticalMarker(float pos, int color,int width)
 
 }// drawVerticalMarker
 
-void TGraphForm::legend(struct leg_data l_data,bool refresh)
+// To be used with animated plots (in association with legendCaptions(.)
+// NB: This Windows version to be checked.
+void TGraphForm::legend(struct leg_data l_data, bool refresh, int numBoxes,int color, int leg_left, int leg_top,int leg_width,int bCol)
+
 {
 
-   //NB: If working for non animating graph, refresh is set to zero
+   char cap1[30], cap2[30], cap3[30], cap4[30];
 
-   char cap1[30], cap2[30], cap3[30], cap4[30];;
+   int cap_width = 65;
+   int left = leg_left + cap_width;
+   int top = leg_top;
 
+   int data_rect_col = bCol;
+   Image1->Canvas->Pen->Color = data_rect_col;
 
-   sprintf(cap1,"%5.2f",l_data.vmax);
-   sprintf(cap2,"%5.2f",l_data.vmin);
-   sprintf(cap3,"%5.2f",l_data.vavg);
-   sprintf(cap4,"%5.2f",l_data.vpp);
-
-   int left = 50;
-   int top = 50;
-
-
-    if(refresh)  //Repaint to background previous value
-    {
+   if(refresh)  //Repaint to background previous value
+   {
        Image1->Canvas->Font->Color = m_cMonoBackCol;
 
-    }
-    else
-    {
-        Image1->Canvas->Font->Color = 3;
-    }
+   }
+   else
+   {
+       Image1->Canvas->Font->Color = color;
+   }
+
+   int shift = 0;
+   int data_width = leg_width - cap_width; //150;
+   int top_high = top + 28;
+   int top_low = top - 5;
+   int left_start = left;
+
+   float data;
+   for(int i = 0; i < numBoxes;i++)
+   {
+
+		if (i == 0)
+		{
+
+           // Repaint rectangle area before writng data
+           Image1->Canvas->Rectangle(shift+left_start,top_low,shift+left_start+data_width,top_high);
+           Image1->Canvas->Brush->Color = clBlack;
+           Image1->Canvas->FloodFill(shift+left_start+1,top_low+1,data_rect_col,fsBorder);
 
 
-   //Output vmax
-   Image1->Canvas->TextOut(left+50,top,cap1);
+   	       if (_isnan(l_data.data1))
+   	       {
+		      sprintf(cap1,"%s  %s","XXXX",l_data.data1_unit);
+	       }
+   	       else
+   	       {
 
-   //Output vmin
-   Image1->Canvas->TextOut(left+50,top+20,cap2);
+				if ( (l_data.data1 == 0.0))
+				{
+					data = l_data.data1;
+					sprintf(cap1,"%5d  %s",(int) data,l_data.data1_unit);
+				}
+				else if ( (l_data.data1 < 1.0) && (l_data.data1 > 1.0e-3))
+				{
 
-   //Ouput vavg:
-   Image1->Canvas->TextOut(left+50,top+40,cap3);
+					data = l_data.data1 * 1000;
+					sprintf(cap1,"%5.2f  %c%s", data,'m',l_data.data1_unit);
+				}
+				else if ( (l_data.data1 >= 1.0) && (l_data.data1 < 1.0e3))
+				{
+					data = l_data.data1;
+					sprintf(cap1,"%5.2f  %s",data,l_data.data1_unit);
+				}
+				else if ( (l_data.data1 >= 1.0e3) && (l_data.data1 < 1.0e6))
+				{
+					data = l_data.data1 / 1000;
+					sprintf(cap1,"%5.2f  %c%s",data,'k',l_data.data1_unit);
+				}
+				else if ( l_data.data1 >= 1.0e6)
+				{
+					data = l_data.data1 / 1000000;
+					sprintf(cap1,"%5.2f  %c%s",data,'M',l_data.data1_unit);
+				}
+			}
 
-   //Output vpp:
-   Image1->Canvas->TextOut(left+50,top+60,cap4);
+            Image1->Canvas->Font->Color = color;
+            Image1->Canvas->TextOut(left+shift+10,top,cap1);
+		}
+		else if (i == 1)
+		{
+
+		   // Repaint rectangle area before writng data
+           Image1->Canvas->Rectangle(shift+left_start,top_low,shift+left_start+data_width,top_high);
+           Image1->Canvas->Brush->Color = clBlack;
+           Image1->Canvas->FloodFill(shift+left_start+1,top_low+1,data_rect_col,fsBorder);
+
+
+   	       if (_isnan(l_data.data2))
+   	       {
+				sprintf(cap2,"%s  %s","XXXX",l_data.data2_unit);
+		   }
+		   else
+		   {
+				if ( (l_data.data2 == 0.0))
+				{
+					data = l_data.data2;
+					sprintf(cap2,"%5d  %s",(int) data,l_data.data2_unit);
+				}
+				else if ( (l_data.data2 < 1.0) && (l_data.data2 > 1.0e-3))
+				{
+
+					data = l_data.data2 * 1000;
+					sprintf(cap2,"%5.2f  %c%s", data,'m',l_data.data2_unit);
+				}
+				else if ( (l_data.data2 >= 1.0) && (l_data.data2 < 1.0e3))
+				{
+					data = l_data.data2;
+					sprintf(cap2,"%5.2f  %s",data,l_data.data2_unit);
+				}
+				else if ( (l_data.data2 >= 1.0e3) && (l_data.data2 < 1.0e6))
+				{
+					data = l_data.data2 / 1000;
+					sprintf(cap2,"%5.2f  %c%s",data,'k',l_data.data2_unit);
+				}
+				else if ( l_data.data2 >= 1.0e6)
+				{
+					data = l_data.data2 / 1000000;
+					sprintf(cap2,"%5.2f  %c%s",data,'M',l_data.data2_unit);
+				}
+		   }
+		   //Output data2
+		   Image1->Canvas->Font->Color = color;
+           Image1->Canvas->TextOut(left+shift+10,top,cap2);
+
+
+		}
+		else if (i == 2)
+		{
+            // Repaint rectangle area before writng data
+           Image1->Canvas->Rectangle(shift+left_start,top_low,shift+left_start+data_width,top_high);
+           Image1->Canvas->Brush->Color = clBlack;
+           Image1->Canvas->FloodFill(shift+left_start+1,top_low+1,data_rect_col,fsBorder);
+
+			if (_isnan(l_data.data3))
+   	        {
+				sprintf(cap3,"%s  %s","XXXX",l_data.data3_unit);
+			}
+			else
+			{
+
+				if ( (l_data.data3 == 0.0))
+				{
+					data = l_data.data3;
+					sprintf(cap3,"%5d  %s",(int) data,l_data.data3_unit);
+				}
+				else if ( (l_data.data3 < 1.0) && (l_data.data3 > 1.0e-3))
+				{
+
+					data = l_data.data3 * 1000;
+					sprintf(cap3,"%5.2f  %c%s", data,'m',l_data.data3_unit);
+				}
+				else if ( (l_data.data3 >= 1.0) && (l_data.data3 < 1.0e3))
+				{
+					data = l_data.data3;
+					sprintf(cap3,"%5.2f  %s",data,l_data.data3_unit);
+				}
+				else if ( (l_data.data3 >= 1.0e3) && (l_data.data3 < 1.0e6))
+				{
+					data = l_data.data3 / 1000;
+					sprintf(cap3,"%5.2f  %c%s",data,'k',l_data.data3_unit);
+				}
+				else if ( l_data.data3 >= 1.0e6)
+				{
+					data = l_data.data3 / 1000000;
+					sprintf(cap3,"%5.2f  %c%s",data,'M',l_data.data3_unit);
+				}
+		   }
+
+			//Ouput data3:
+			Image1->Canvas->Font->Color = color;
+            Image1->Canvas->TextOut(left+shift+10,top,cap3);
+
+
+
+		}
+		else if (i == 3)
+		{
+           // Repaint rectangle area before writng data
+           Image1->Canvas->Rectangle(shift+left_start,top_low,shift+left_start+data_width,top_high);
+           Image1->Canvas->Brush->Color = clBlack;
+           Image1->Canvas->FloodFill(shift+left_start+1,top_low+1,data_rect_col,fsBorder);
+
+   	       if (_isnan(l_data.data4))
+   	       {
+				sprintf(cap4,"%s  %s","XXXX",l_data.data4_unit);
+		   }
+		   else
+		   {
+
+				if ( (l_data.data4 == 0.0))
+				{
+					data = l_data.data4;
+					sprintf(cap4,"%5d  %s",(int) data,l_data.data4_unit);
+				}
+				else if ( (l_data.data4 < 1.0) && (l_data.data4 > 1.0e-3))
+				{
+					data = l_data.data4 * 1000;
+					sprintf(cap4,"%5.2f  %c%s", data,'m',l_data.data4_unit);
+				}
+				else if ( (l_data.data4 >= 1.0) && (l_data.data4 < 1.0e3))
+				{
+					data = l_data.data4;
+					sprintf(cap4,"%5.2f  %s",data,l_data.data4_unit);
+				}
+				else if ( (l_data.data4 >= 1.0e3) && (l_data.data4 < 1.0e6))
+				{
+					data = l_data.data4 / 1000;
+					sprintf(cap4,"%5.2f  %c%s",data,'k',l_data.data4_unit);
+				}
+				else if ( l_data.data4 >= 1.0e6)
+				{
+					data = l_data.data4 / 1000000;
+					sprintf(cap4,"%5.2f  %c%s",data,'M',l_data.data4_unit);
+				}
+		   }
+
+		   //Output data4:
+		   Image1->Canvas->Font->Color = color;
+           Image1->Canvas->TextOut(left+shift+10,top,cap4);
+
+		}
+
+        shift += leg_width;
+   }
+
+
 
 
 }//legend
 
 
-void TGraphForm::legendCaptions(struct leg_captions l_caps,int col)
+// This method can be used for animated plots (e.g. an oscilloscope trace)
+// where information can be updated in real time.
+// Each box contains a single item with caption and data.
+// This legend provides the legend captions.
+// Provides up to four legend boxes side by side.
+// To be used with legend(.) function which provides the data.
+// NB: This Windows version to be checked.
+void TGraphForm::legendCaptions(struct leg_captions l_caps,int col, int numBoxes, int leg_left, int leg_top,int leg_width,int bCol)
+
 {
 
+   int left = leg_left;
+   int top = leg_top;
+   int box_width = leg_width;
+   int border_color = bCol;
 
-   int left = 50;
-   int top = 50;
+   for(int i = 0; i < numBoxes; i++)
+   {
 
-   //Write legend border:
-   Image1->Canvas->Brush->Color = 4;
-   Image1->Canvas->Rectangle(left-5,top-5,left+120,top+80);
+        // Write main box:
+		Image1->Canvas->Pen->Color = border_color;
+		Image1->Canvas->Rectangle(left,top-5,left+box_width,top+28);
+   	    Image1->Canvas->Brush->Color = clBlack;
+        Image1->Canvas->FloodFill(left+1,top-5+1,border_color,fsBorder);
 
-   //Write captions:
-   Image1->Canvas->Brush->Color = col;
 
-   Image1->Canvas->TextOut(left,top,l_caps.vmax_caption);
-   Image1->Canvas->TextOut(left,top+20,l_caps.vmin_caption);
-   Image1->Canvas->TextOut(left,top+40,l_caps.vavg_caption);
-   Image1->Canvas->TextOut(left,top+60,l_caps.vpp_caption);
+		//Write captions:
+        Image1->Canvas->Brush->Color = clBlack;
+        Image1->Canvas->Font->Color = col;
+        Image1->Canvas->Font->Style = TFontStyles() << fsBold;
 
+
+		if ( i == 0)
+		{
+			Image1->Canvas->TextOut(left+5,top,l_caps.data1_caption);
+		}
+		else if (i == 1)
+		{
+			Image1->Canvas->TextOut(left+5,top,l_caps.data2_caption);
+		}
+		else if ( i == 2)
+		{
+			Image1->Canvas->TextOut(left+5,top,l_caps.data3_caption);
+		}
+		else if (i == 3)
+		{
+			Image1->Canvas->TextOut(left+5,top,l_caps.data4_caption);
+		}
+
+		left += box_width;
+   }
 
 
 }//legendCaptions

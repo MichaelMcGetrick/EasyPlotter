@@ -365,19 +365,25 @@ extern PACKAGE TGraphForm *GraphForm;
  //LEGEND ATTRIBUTES
  struct leg_captions     //This can be expanded as and when required
  {
-     char* vmax_caption;
-     char* vmin_caption;
-     char* vavg_caption;
-     char* vpp_caption;
+     char* data1_caption;
+     char* data2_caption;
+     char* data3_caption;
+     char* data4_caption;
+     
  };
 
 
  struct leg_data     //This can be expanded as and when required
  {
-     float vmax;    //Max. voltage
-     float vmin;    //Min voltage
-     float vavg;    //Mean voltage
-     float vpp;     //Peak to peak voltage
+     float data1;
+     float data2;
+     float data3;
+     float data4;
+     char *data1_unit;
+     char *data2_unit;
+     char *data3_unit;
+     char *data4_unit;
+
  };
  struct leg_captions l_caps;
  struct leg_data l_data;
@@ -554,6 +560,7 @@ private:	// User declarations
 
 //COMMON LINUX-WINDOWS FUNCTIONS -----------------------------------------
 
+
 public:		// User declarations
          __fastcall TGraphForm(TComponent* Owner,
                                   int formWidth,int formHeight,
@@ -599,8 +606,8 @@ public:		// User declarations
         void xPlotIncr(int xincr){xincrement = xincr;}
         void circleSize(int cSize){cirSize = cSize;}
         void lineWidth(int width);
-        void legend(struct leg_data l_data, bool refresh);
-        void legendCaptions(struct leg_captions l_caps,int col);
+        void legend(struct leg_data l_data, bool refresh, int numBoxes,int color, int leg_left, int leg_top,int leg_width,int bCol);
+        void legendCaptions(struct leg_captions l_caps,int col, int numBoxes, int leg_left, int leg_top,int leg_width,int bCol);
         void legendCaptions1(TColor col,TColor bck_color,int numPlots,struct legend_info info[],int left, int top,
                              int width, int height);
         void axisDefaults(int xdivs,int ydivs,char *xspec, char *yspec);
