@@ -25,6 +25,7 @@
 #include "a_arrow.hpp"
 #include "a_barplot.hpp"
 #include "a_bitmap.hpp"
+#include <windows.h>
 
 
 #if !defined(ORI_WIN_CODE)

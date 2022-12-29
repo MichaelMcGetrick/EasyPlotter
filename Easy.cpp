@@ -26,6 +26,9 @@ __fastcall TEasyPlotForm::TEasyPlotForm(TComponent* Owner)
    //Form Positioning:
    Left = 300;
 
+   //Test *test = new Test();
+   //test.func1();
+   
 
    //Initialise base pointer to shape animation classes:
    //m_pShape = NULL;
@@ -645,7 +648,7 @@ void TEasyPlotForm::parseDefFile()
 	  m_bProgrammedControl = false;
 
    }
-   
+
 
 }//parseDefFile
 
@@ -653,56 +656,6 @@ void TEasyPlotForm::parseDefFile()
 
 void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 {
-
-
-      /*
-      //Set status bar:
-      if(!m_bAnimation)
-      {
-         StatusBar1->Panels->Items[0]->Text = "Plot mode";
-         StatusBar1->Panels->Items[1]->Text = "";
-      }
-      else
-      {
-        StatusBar1->Panels->Items[0]->Text = "Animation mode";
-      }
-
-
-
-     //Draw required data plot:
-     int intvar;
-      char title[100], tmp[100];
-      //int xPlotStartVal;
-      float xPlotStartVal;
-      float xRange,yRange,yMin,xMin;
-      //Define data plot file name:
-      intvar = Edit1->GetTextLen();
-      Edit1->GetTextBuf(tmp,intvar+1);
-      strcpy(m_sDataFile,tmp);
-
-
-      //Check to see if a wave file:
-      int len = strlen(m_sDataFile);
-      if( ( (m_sDataFile[len-1] == 'v') && (m_sDataFile[len-2] == 'a') &&
-          (m_sDataFile[len-3] == 'w') )  )
-      {
-           m_bIsWaveFile = true;
-      }
-      else
-      {
-          m_bIsWaveFile = false;
-      }
-
-
-      //If wave file, use special plot and graphic routine:
-      if(m_bIsWaveFile)
-      {
-         //Plot wave file here
-         plotWaveFile();
-         return;
-
-      }
-      */
 
       //-----------------------------------------------------
       //Set status bar:
@@ -780,16 +733,19 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 			 //sprintf(mes,"%s%s","The file selected is not a .WAV or .DAT type.\n",
 			 //                 "Please select again.");
 
-
+#if WIDE_CHAR_APP
 			 String str = "BEST_MESSAGE";
 			 wchar_t mes[] = L"The file selected is not a .WAV or .DAT type.\nPlease select again.";
 			 wchar_t cap[100];
 			 StringToWideChar(str,cap,99);
 
-
-
 			 MessageBox(NULL,mes,cap,MB_ICONINFORMATION);
 			 return;
+#else
+             MessageBox(NULL,"The file selected is not a .WAV or .DAT type.\nPlease select again."
+                        ,BEST_MESSAGE,MB_ICONINFORMATION);
+			 return;
+#endif
 		  }
 		  else
 		  {
@@ -953,7 +909,7 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 
 			}//if(!m_bFileIgnore)
 
-
+#ifdef WIDE_CHAR_APP
 			//Populate Edit boxes with results:
 			String str = m_sAutoNumStr;
 			wchar_t buf[100];
@@ -971,6 +927,16 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 			float2Str(m_fAutoYMax);
 			//Edit8->SetTextBuf(m_sAutoNumStr);
 			Edit8->SetTextBuf(buf);
+#else
+           float2Str (m_fAutoXMax);
+           Edit5->SetTextBuf(m_sAutoNumStr);
+           float2Str (m_fAutoXMin);
+           Edit6->SetTextBuf(m_sAutoNumStr);
+           float2Str (m_fAutoYMin);
+           Edit7->SetTextBuf(m_sAutoNumStr);
+           float2Str (m_fAutoYMax);
+           Edit8->SetTextBuf(m_sAutoNumStr);
+#endif
 
 
 	  }//if(CheckBox2->Checked)
@@ -979,47 +945,83 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 
 	  //Define graph title:
 	  intvar = Edit2->GetTextLen();
+#ifdef WIDE_CHAR_APP
 	  Edit2->GetTextBuf(wtmp,intvar+1);
 	  wcstombs(tmp, wtmp, 99);
-	  strcpy(title,tmp);
+      strcpy(title,tmp);
+#else
+      Edit2->GetTextBuf(tmp,intvar+1);
+      strcpy(title,tmp);
+#endif
+
 
 
 	  //x-axis label:
 	  intvar = Edit3->GetTextLen();
+#ifdef WIDE_CHAR_APP
 	  Edit3->GetTextBuf(wtmp,intvar+1);
 	  wcstombs(tmp, wtmp, 99);
 	  strcpy(m_sXLabel,tmp);
+#else
+      Edit3->GetTextBuf(tmp,intvar+1);
+	  strcpy(m_sXLabel,tmp);
+#endif
 
 	  //y-axis label:
 	  intvar = Edit4->GetTextLen();
+#ifdef WIDE_CHAR_APP
 	  Edit4->GetTextBuf(wtmp,intvar+1);
 	  wcstombs(tmp, wtmp, 99);
 	  strcpy(m_sYLabel,tmp);
+#else
+      Edit4->GetTextBuf(tmp,intvar+1);
+	  strcpy(m_sYLabel,tmp);
+#endif
 
 
 	  if(CheckBox2->Checked == false)  //Suppress for auto-scale
 	  {
 		 //Define range for plotting:
 		 intvar = Edit8->GetTextLen();
+#ifdef WIDE_CHAR_APP
 		 Edit8->GetTextBuf(wtmp,intvar+1);
 		 wcstombs(tmp, wtmp, 99);
 		 yRange = atof(tmp);
+#else
+         Edit8->GetTextBuf(tmp,intvar+1);
+		 yRange = atof(tmp);
+#endif
 
 		 intvar = Edit7->GetTextLen();
+#ifdef WIDE_CHAR_APP
 		 Edit7->GetTextBuf(wtmp,intvar+1);
 		 wcstombs(tmp, wtmp, 99);
 		 yMin = atof(tmp);
+#else
+         Edit7->GetTextBuf(tmp,intvar+1);
+		 yMin = atof(tmp);
+#endif
 
 		 intvar = Edit6->GetTextLen();
+#ifdef WIDE_CHAR_APP
 		 Edit6->GetTextBuf(wtmp,intvar+1);
 		 wcstombs(tmp, wtmp, 99);
 		 xMin = atof(tmp);
+#else
+         Edit6->GetTextBuf(tmp,intvar+1);
+		 xMin = atof(tmp);
+#endif
 
 
 		 intvar = Edit5->GetTextLen();
+#ifdef WIDE_CHAR_APP
 		 Edit5->GetTextBuf(wtmp,intvar+1);
 		 wcstombs(tmp, wtmp, 99);
 		 xRange = atof(tmp);
+#else
+         Edit5->GetTextBuf(tmp,intvar+1);
+		 xRange = atof(tmp);
+#endif
 	  }
 
 
@@ -1099,12 +1101,17 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 
 		  if(!m_bAnimation)
 		  {
+#ifdef WIDE_CHAR_APP
 		   //Inform user that the DELETE button needs to be pressed to close the form;
 		   String str = BEST_MESSAGE;
 		   wchar_t mes[] = L"In this Graph Mode, the menu and top border controls are not available.\nYou may close the form by pressing the DELETE button.";
 		   wchar_t cap[100];
 		   StringToWideChar(str,cap,99);
 		   MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
+#else
+           MessageBox(NULL,"In this Graph Mode, the menu and top border controls are not available.\nYou may close the form by pressing the DELETE button.",
+                      BEST_MESSAGE,MB_ICONEXCLAMATION);
+#endif
 		  }
 
 	  }
@@ -1126,6 +1133,7 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 											//reqFormWidth,reqFormHeight,bsSizeable,m_bDrawBorder);
 											reqFormWidth,reqFormHeight,bStyle,m_bDrawBorder,
 											m_bDisableGraphMenu);
+
 
 	  graphFrm->circleSize(m_iDataPlotSize);
 	  m_GraphFrm = graphFrm;
@@ -1186,6 +1194,7 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 						  m_cDataSet[0],m_cDataSet[1],m_cDataSet[2],m_cLegend,
 						  m_iPlotMode[0],m_iPlotMode[1],m_iPlotMode[2]);
 	  }
+
 	  if(!m_bAnimation)
 	  {
 		 graphFrm->Show();
@@ -1205,7 +1214,7 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 		 plotData(graphFrm);
 
 	  }//if(!m_bAnimation)
-	  else      //Perform animation requirements:
+      else      //Perform animation requirements:
 	  {
 
 		 //Timer1->Enabled = false;
@@ -1219,13 +1228,13 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 		 m_bProcFIXED = false;
 		 m_bProcVAR = true;
 
-		 /* OLD CODE
+		 // OLD CODE
 		 //Perform <VAR> operations:
-		 if(m_bVARPresent)
-		 {
-			doPlotType(graphFrm,m_sVARSingle,0);
-		 }
-		 */
+		 //if(m_bVARPresent)
+		 //{
+		 //	doPlotType(graphFrm,m_sVARSingle,0);
+		 //}
+		 //
 		 // REPLACED BY
 		 //Perform <VAR> operations:
 		 if(m_bVARPresent)
@@ -1238,6 +1247,7 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 		 //Timer1->Enabled = true;
 
 	  }//else
+
 #else
 
 // --------------------------------------------------------------------
@@ -1396,6 +1406,7 @@ void TEasyPlotForm::doGraph()
                                 LEGEND_WIDTH,LEGEND_HEIGHT);
 
    }
+
 
    // Define size of data plots:
    graphFrm->circleSize(SYMBOL_SIZE);
@@ -5031,7 +5042,8 @@ void __fastcall TEasyPlotForm::previewBtnClick(TObject *Sender)
 void TEasyPlotForm::getDirectoryTag()
 {
 
-  int cnt = 0;
+  #ifdef WIDE_CHAR_APP
+   int cnt = 0;
   strcpy(m_sDirTag,"");
   //for(int i=strlen(m_sMovieTargetRoot);i>=0;i--)
   for(int i=wcslen(m_swMovieTargetRoot);i>=0;i--)
@@ -5052,6 +5064,32 @@ void TEasyPlotForm::getDirectoryTag()
   {
 	  m_sDirTag[i] = m_swMovieTargetRoot[len+1+i];
   }
+
+#else
+
+   int cnt = 0;
+  strcpy(m_sDirTag,"");
+  for(int i=strlen(m_sMovieTargetRoot);i>=0;i--)
+  {
+    if(m_sMovieTargetRoot[i] != '\\')
+    {
+       cnt++;
+    }
+    else
+    {
+      break;
+    }
+
+  }
+  int len = strlen(m_sMovieTargetRoot)-cnt;
+  for(int i=0;i<cnt;i++)
+  {
+      m_sDirTag[i] = m_sMovieTargetRoot[len+1+i];
+  }
+
+#endif
+
+
 
 
 }//getDirectoryTag
@@ -5175,6 +5213,8 @@ void __fastcall TEasyPlotForm::SelPrevBtnClick(TObject *Sender)
   m_iDirCnt = 1;
   itoa(m_iDirCnt,tmp,10);
   sprintf(filename,"%s%s%s%s%s%s%s", m_sMovieTargetRoot,"\\",m_sDirTag,tmp,"\\",fStr,".bmp");
+
+
 
   FILE *fp;
   if( (fp=fopen(filename,"rb")) == NULL )
@@ -5770,7 +5810,7 @@ void __fastcall TEasyPlotForm::Timer1Timer(TObject *Sender)
 
 void TEasyPlotForm::parseTagFile1()
 {
-   
+
    char contents[9000];
    char ch[2];
 
@@ -6176,28 +6216,8 @@ void __fastcall TEasyPlotForm::previewBtnClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TEasyPlotForm::getDirectoryTag()
 {
-  /*
-   int cnt = 0;
-  strcpy(m_sDirTag,"");
-  for(int i=strlen(m_sMovieTargetRoot);i>=0;i--)
-  {
-    if(m_sMovieTargetRoot[i] != '\\')
-    {
-       cnt++;
-    }
-    else
-    {
-      break;
-    }
-
-  }
-  int len = strlen(m_sMovieTargetRoot)-cnt;
-  for(int i=0;i<cnt;i++)
-  {
-      m_sDirTag[i] = m_sMovieTargetRoot[len+1+i];
-  }
-  */
-
+    
+#ifdef WIDE_CHAR_APP
    int cnt = 0;
   strcpy(m_sDirTag,"");
   //for(int i=strlen(m_sMovieTargetRoot);i>=0;i--)
@@ -6219,6 +6239,30 @@ void TEasyPlotForm::getDirectoryTag()
   {
 	  m_sDirTag[i] = m_swMovieTargetRoot[len+1+i];
   }
+
+#else
+
+   int cnt = 0;
+  strcpy(m_sDirTag,"");
+  for(int i=strlen(m_sMovieTargetRoot);i>=0;i--)
+  {
+    if(m_sMovieTargetRoot[i] != '\\')
+    {
+       cnt++;
+    }
+    else
+    {
+      break;
+    }
+
+  }
+  int len = strlen(m_sMovieTargetRoot)-cnt;
+  for(int i=0;i<cnt;i++)
+  {
+      m_sDirTag[i] = m_sMovieTargetRoot[len+1+i];
+  }
+  
+#endif
 
 }//getDirectoryTag
 
@@ -6253,7 +6297,7 @@ void __fastcall TEasyPlotForm::Timer2Timer(TObject *Sender)
 		 itoa(m_iDirCnt,tmp,10);
 		 char dir[200];
 		 sprintf(dir,"%s%s%s%s", m_sMovieTargetRoot,"\\",m_sDirTag,tmp);
-		 if(DirectoryExists(dir))
+         if(DirectoryExists(dir))
 		 {
 			m_iPreviewIndex = 0;
 			return;
@@ -6340,6 +6384,7 @@ void __fastcall TEasyPlotForm::SelPrevBtnClick(TObject *Sender)
   itoa(m_iDirCnt,tmp,10);
   sprintf(filename,"%s%s%s%s%s%s%s", m_sMovieTargetRoot,"\\",m_sDirTag,tmp,"\\",fStr,".bmp");
 
+
   FILE *fp;
   if( (fp=fopen(filename,"rb")) == NULL )
   {
@@ -6405,4 +6450,5 @@ void __fastcall TEasyPlotForm::SelPrevBtnClick(TObject *Sender)
 //---------------------------------------------------------------------------
 
 #endif
+
 
