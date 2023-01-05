@@ -59,16 +59,26 @@ A_Shape::A_Shape(int plotProc,char *plotType,TGraphForm *gph,std::vector<std::st
 TColor A_Shape::setColor(const char *color)
 {
 
-	if( !strcmp(color,"White") ) return clWhite;
-	if( !strcmp(color,"Black") ) return clBlack;
-	if( !strcmp(color,"Red") ) return clRed;
-	if( !strcmp(color,"Blue") ) return clBlue;
-	if( !strcmp(color,"Yellow") ) return clYellow;
-	if( !strcmp(color,"Green") ) return clGreen;
-	if( !strcmp(color,"Maroon") ) return clMaroon;
-	if( !strcmp(color,"Lime") ) return clLime;
-	if( !strcmp(color,"Purple") ) return clPurple;
-	if( !strcmp(color,"Grey") ) return clGray;
+	if( strstr(color,"White") != NULL )
+        return clWhite;
+	if( strstr(color,"Black") != NULL )
+        return clBlack;
+	if( strstr(color,"Red") != NULL )
+        return clRed;
+	if( strstr(color,"Blue") != NULL )
+        return clBlue;
+	if( strstr(color,"Yellow") != NULL )
+         return clYellow;
+	if( strstr(color,"Green") != NULL )
+         return clGreen;
+	if( strstr(color,"Maroon") != NULL )
+         return clMaroon;
+	if( strstr(color,"Lime") != NULL )
+         return clLime;
+	if( strstr(color,"Purple") != NULL )
+        return clPurple;
+	if( strstr(color,"Grey") != NULL )
+        return clGray;
 
 }//setColor
 
@@ -77,57 +87,57 @@ TColor A_Shape::setColor1(const char *color)
 {
 	TColor Color;
 
-	if( !strcmp(color,"white") )
+    if( strstr(color,"white") != NULL )
 	{
 		Color = clWhite;
 
 	}
-	if( !strcmp(color,"black") )
+	if( strstr(color,"black") != NULL )
 	{
 		Color = clBlack;
 
 	}
-	if( !strcmp(color,"red") )
+	if( strstr(color,"red") != NULL )
 	{
 	   Color = clRed;
 
 	}
-	if( !strcmp(color,"blue") )
+	if( strstr(color,"blue") != NULL )
 	{
 	  Color = clBlue;
 
 	}
-	if( !strcmp(color,"yellow") )
+	if( strstr(color,"yellow") != NULL )
 	{
 	   Color = clYellow;
 
 	}
-	if( !strcmp(color,"green") )
+	if( strstr(color,"green") != NULL )
 	{
 	   Color = clGreen;
 
 	}
-	if( !strcmp(color,"maroon") )
+	if( strstr(color,"maroon") != NULL )
 	{
 		Color = clMaroon;
 
 	}
-	if( !strcmp(color,"lime") )
+	if( strstr(color,"lime") != NULL )
 	{
 	  Color = clLime;
 
 	}
-	if( !strcmp(color,"purple") )
+	if( strstr(color,"purple") != NULL )
 	{
 		Color = clPurple;
 
 	}
-	if( !strcmp(color,"grey") )
+	if( strstr(color,"grey") != NULL )
 	{
 		Color = clGray;
 
 	}
-
+    
 	return Color;
 
 }//setColor1

@@ -46,8 +46,8 @@ void A_BarPlot::upDown()
 	  width =  atoi(m_vArgs[4].c_str());
 
 	  //Set the required brush color:
-	  m_vArgs[5][0] = toupper(m_vArgs[5][0]);
-	  Color = setColor(m_vArgs[5].c_str());
+	  //m_vArgs[5][0] = toupper(m_vArgs[5][0]);
+	  Color = setColor1(m_vArgs[5].c_str());
 
    }
    if(m_bProcFIXED)
@@ -59,8 +59,8 @@ void A_BarPlot::upDown()
 	  width =  atoi(m_vArgs[4].c_str());
 
 	  //Set the required brush color:
-	  m_vArgs[5][0] = toupper(m_vArgs[5][0]);
-	  Color = setColor(m_vArgs[5].c_str());
+	  //m_vArgs[5][0] = toupper(m_vArgs[5][0]);
+	  Color = setColor1(m_vArgs[5].c_str());
 
    }
 

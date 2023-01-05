@@ -225,11 +225,11 @@ __fastcall TEasyPlotForm::TEasyPlotForm(TComponent* Owner)
 
 
    //Indicate whether using legacy or Linux integrated code:
-#ifdef ORI_WIN_CODE
-   StatusBar1->Panels->Items[1]->Text = "LEGACY WINDOWS CODE RUNNING";
-#else
-   StatusBar1->Panels->Items[1]->Text = "  LINUX INTEGRATED CODE RUNNING";
-#endif
+//#ifdef ORI_WIN_CODE
+//   StatusBar1->Panels->Items[1]->Text = "LEGACY WINDOWS CODE RUNNING";
+//#else
+//   StatusBar1->Panels->Items[1]->Text = "  LINUX INTEGRATED CODE RUNNING";
+//#endif
 
 
 }
@@ -263,7 +263,7 @@ void TEasyPlotForm::GetIniFileSettings()
       }
 
    }//i
-   
+
 
 }//GetIniFileSettings
 
@@ -716,7 +716,7 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 
 
 
-#ifdef ORI_WIN_CODE
+#if defined(GRAPH_ANIMATION)
 
       //If not a .wav file, check to see that file extension is .dat:
 	  len = strlen(m_sDataFile);
@@ -1120,7 +1120,9 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 		 bStyle = bsSizeable;
 	  }
 
-	  TGraphForm *graphFrm = new TGraphForm(this,true,m_iPlotMode[0],
+
+
+      TGraphForm *graphFrm = new TGraphForm(this,true,m_iPlotMode[0],
 											m_iLogPlotMode, m_sXLabel, m_sYLabel, title,
 											yMin,yRange, xPlotStartVal, xRange,
 											10, 10, m_bXGrad,m_bYGrad,
@@ -1267,7 +1269,7 @@ void __fastcall TEasyPlotForm::PlotBtnClick(TObject *Sender)
 
 }
 
-#if !defined(ORI_WIN_CODE)
+#if !defined(GRAPH_ANIMATION)
 // ------------------------------------------------------------------------
 // Define Linux integrated functions here
 // ------------------------------------------------------------------------
@@ -1599,23 +1601,8 @@ void TEasyPlotForm::doGraph()
 //---------------------------------------------------------------------------
 void TEasyPlotForm::doPlotType(TGraphForm *graphFrm,char *plotType,int index)
 {
-   
-  //--------------------------------------------------------------
-	if( strcmp(plotType,"DPLOT") == NULL)
-   {
-	  if(m_iLogPlotMode==0)        //Linear plot
-	  {
-		 plotData(graphFrm);
 
-	  }
-	  else if(m_iLogPlotMode==1)
-	  {
-		 plotData(graphFrm);
 
-	  }
-
-	  return;
-   }//if (DPLOT)
    //----------------------------------------------------------------
    //PROCESSING STARTS HERE FOR SPECIALISED SHAPE CLASSES:
 	int sign;
@@ -1655,8 +1642,38 @@ void TEasyPlotForm::doPlotType(TGraphForm *graphFrm,char *plotType,int index)
 	   PlotProc = 0;
 	}
 
+   //--------------------------------------------------------------
+   if( strcmp(plotType,"DPLOT") == NULL)
+   {
 
-   if( (strcmp(plotType,"HLINE") == NULL) ||
+      if(m_bProcVAR)
+      {
+	     m_iTotAniCnt = atof(arglist[1].c_str()) - atof(arglist[0].c_str());
+         m_iTotAniCnt += 1;
+
+      }
+      if(m_bProcFIXED)
+      {
+	     m_iTotAniCnt = 1;
+	  }
+
+      m_iMaxTotAniCnt = m_iTotAniCnt;
+
+	  if(m_iLogPlotMode==0)        //Linear plot
+	  {
+		 plotData(graphFrm);
+
+	  }
+	  else if(m_iLogPlotMode==1)
+	  {
+		 plotData(graphFrm);
+
+	  }
+
+	  return;
+
+   }//if (DPLOT)
+   else if( (strcmp(plotType,"HLINE") == NULL) ||
 			(strcmp(plotType,"VLINE") == NULL)    )
    {
 
@@ -1817,7 +1834,7 @@ void TEasyPlotForm::doPlotType(TGraphForm *graphFrm,char *plotType,int index)
 
 void TEasyPlotForm::plotData(TGraphForm *graphFrm)
 {
-    
+
 	//Plot first data set:
 	m_fmData.SetPtrBegin();
 
@@ -2113,7 +2130,7 @@ void TEasyPlotForm::plotWaveFile()
 
 #endif
 
-   
+
    //Show graph form:
    graphFrm->circleSize(m_iDataPlotSize);
    graphFrm->Caption= "UtterSense";
@@ -3179,7 +3196,7 @@ void TEasyPlotForm::setDataSetColors(char *color,int index)
 //---------------------------------------------------------------------------
 void TEasyPlotForm::setLegendBackgroundColor(char *color)
 {
-   
+
    if(!strcmp(color,"White") )
    {
 	  m_cLegend = clWhite;
@@ -3223,7 +3240,7 @@ void TEasyPlotForm::setLegendBackgroundColor(char *color)
 
 char* TEasyPlotForm::setLegendComboBackgroundColor()
 {
-   
+
    if(m_cLegend == clWhite)
    {
 	  return "White";
@@ -4105,1184 +4122,7 @@ void TEasyPlotForm::float2Str(float num)
 
 }//float2Str1
 
-#ifdef ORI_WIN_CODE
-void __fastcall TEasyPlotForm::animateBtnClick(TObject *Sender)
-{
-   
-   //Run the plot code:
 
-   //Dialog box to choose 'program file':
-  //View requested wavefile:
-   char old_dir[MAXPATH],new_dir[MAXPATH];
-   char fileName[200];
-
-   //Get current directory:
-   strcpy(old_dir,"X:\\");
-   old_dir[0] = 'A' + getdisk();
-   getcurdir(0,old_dir+3);
-   strcpy(m_sOldDir,old_dir);
-
-   int endWordPos;
-   char tmp1[10];
-
-   strcpy(tmp1,"");
-
-
-   //OpenDialog1->Filter = "wav;dat;txt;csv";
-   OpenDialog1->Filter =  "Tag program files (*.tag)|*.TAG|Def files (*.def)|*.DEF";
-   OpenDialog1->Title = "Select required animation program file ...";
-   OpenDialog1->FileName = "";
-   OpenDialog1->Options << ofHideReadOnly << ofEnableSizing << ofAllowMultiSelect;
-   OpenDialog1->FilterIndex = 2; //Show  DEF files first
-   if( OpenDialog1->Execute())
-   {
-
-	  if(OpenDialog1->Files->Count == 1 )
-	  {
-		 //Process for only one .tag or one .def file
-		 if(OpenDialog1->FilterIndex == 1)
-		 {
-			//Process a single .tag file
-			char str[200];
-#ifdef WIDE_CHAR_APP
-			wcstombs(str, (OpenDialog1->FileName).c_str(), 199);
-#else
-            strcpy(str, (OpenDialog1->FileName).c_str());
-#endif
-			//strcpy(m_sTagFile,(OpenDialog1->FileName).c_str());
-			strcpy(m_sTagFile,str);
-			m_iTagFileCount = 1;
-
-		 }
-		 if(OpenDialog1->FilterIndex == 2)
-		 {
-
-		   char str[200];
-#ifdef WIDE_CHAR_APP
-		   wcstombs(str, (OpenDialog1->FileName).c_str(), 199);
-#else
-           strcpy(str, (OpenDialog1->FileName).c_str());
-#endif
-		   strcpy(m_sDefFile,str);
-
-		   //Set up the tag file list from control (DEF) file:
-		   parseDefFile();
-		 }
-
-	  }
-	  else
-	  {
-		 //Check that multi fils are of .tsg type (.def type multi choice invalid)
-		 if(OpenDialog1->FilterIndex == 2)
-		 {
-#ifdef WIDE_CHAR_APP
-		   String str = "BEST_MESSAGE";
-		   wchar_t mes[] = L"Multi Selection for a .DEF file is invalid\nPlease try again.";
-		   wchar_t cap[100];
-		   StringToWideChar(str,cap,99);
-
-		   MessageBox(NULL,mes,cap,MB_ICONINFORMATION);
-		   return;
-#else
-           MessageBox(NULL,"Multi Selection for a .DEF file is invalid\nPlease try again.",
-           BEST_MESSAGE,MB_ICONINFORMATION);
-		   return;
-#endif
-
-		 }
-
-		 //Multi tagfile select:
-		 m_bMultiTagFiles = true;
-		 if(m_SLTagFiles == NULL)
-		 {
-			m_SLTagFiles = new TStringList();
-
-		 }
-		 m_iTagFileCount = 0;
-		 for(int i=0;i<OpenDialog1->Files->Count;i++)
-		 {
-			m_SLTagFiles->Add(OpenDialog1->Files->Strings[i]);
-			m_iTagFileCount++;
-		 }
-
-
-		 //Reorder stringlist to ensure entries are in alphabetical order:
-		 int index= 1;
-		 char numStr[10];
-		 itoa(index,numStr,10);
-		 strcat(numStr,".tag");
-		 TStringList *tempList = new TStringList();
-		 //Initialise temp string:
-		 for(int i=0;i<m_iTagFileCount;i++)
-		 {
-			tempList->Add("");
-		 }
-
-		 bool processing = true;
-
-		 //Check files are numbered correctly (1...n in steps of 1)
-		 bool match = false;
-		 while(processing)
-		 {
-			for(int i=0;i<m_iTagFileCount;i++)
-			{
-			   char str[200];
-#ifdef WIDE_CHAR_APP
-			   wcstombs(str, m_SLTagFiles->Strings[i].c_str(), 199);
-#else
-               strcpy(str, m_SLTagFiles->Strings[i].c_str());
-#endif
-
-			   //if( strstr(m_SLTagFiles->Strings[i].c_str(),numStr) != NULL )
-			   if( strstr(str,numStr) != NULL )
-			   {
-				 match = true;
-				 tempList->Strings[index-1] = m_SLTagFiles->Strings[i];
-				 break;
-			   }
-			}//i
-
-			if(!match)
-			{
-			   //char mes[200];
-			   //sprintf(mes,"%s%s","Tag files not numbered in correct sequence.\n",
-			   //		   "Please try again.");
-#ifdef WIDE_CHAR_APP
-			   String str = "BEST_MESSAGE";
-			   wchar_t mes[] = L"Tag files not numbered in correct sequence.\nPlease try again.";
-			   wchar_t cap[100];
-			   StringToWideChar(str,cap,99);
-
-			   MessageBox(NULL,mes,cap,MB_ICONINFORMATION);
-			   return;
-#else
-               MessageBox(NULL,"Tag files not numbered in correct sequence.\nPlease try again.",
-                          BEST_MESSAGE,MB_ICONINFORMATION);
-			   return;
-#endif
-
-			}
-			else
-			{
-			   index++;
-			   itoa(index,numStr,10);
-			   strcat(numStr,".tag");
-			   match = false;
-			}
-			if(index==m_iTagFileCount+1)
-			{
-			   processing = false;
-			}
-
-		 }//while
-
-
-		 for(int i=0;i<m_iTagFileCount;i++)
-		 {
-			m_SLTagFiles->Strings[i] = tempList->Strings[i];
-
-			String str = "BEST_MESSAGE";
-			wchar_t cap[100];
-			StringToWideChar(str,cap,99);
-
-			//MessageBox(NULL,m_SLTagFiles->Strings[i].c_str(),cap,0);
-		 }//i
-
-		 //Assign first tsg file name:
-		 char str[200];
-#ifdef WIDE_CHAR_APP
-		 wcstombs(str,m_SLTagFiles->Strings[0].c_str() , 199);
-#else
-         strcpy(str,m_SLTagFiles->Strings[0].c_str());
-#endif
-		 //strcpy(m_sTagFile,m_SLTagFiles->Strings[0].c_str());
-		 strcpy(m_sTagFile,str);
-	  }
-
-
-	  setUpSubDir();
-	  /*
-	  //Create required subdir for target files:
-	  char tmp[10];
-
-	  getDirectoryTag();
-	  m_iDirCnt = 1;
-	  m_iAniCumCnt = 1;
-	 itoa(m_iDirCnt,tmp,10);
-	 char dir[200];
-	 sprintf(dir,"%s%s%s%s",m_sMovieTargetRoot,"\\",m_sDirTag,tmp);
-	 strcpy(m_sMovieTarget,dir);
-	 if(!DirectoryExists(m_sMovieTarget))
-	 {
-		if( mkdir(m_sMovieTarget) == -1 )
-		{
-			String str = "BEST_MESSAGE";
-			wchar_t mes[] = L"Problem creating target sub-directory.";
-			wchar_t cap[100];
-			StringToWideChar(str,cap,99);
-
-			MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
-
-		}
-	 }
-
-	  //Change back to original directory:
-	  if(chdir(old_dir) == -1)
-	  {
-
-		 String str = "BEST_MESSAGE";
-		 wchar_t mes[] = L"Problem changing to old dir!";
-		 wchar_t cap[100];
-		 StringToWideChar(str,cap,99);
-
-		 MessageBox(NULL,mes,cap,0);
-	  }
-	  */
-   }
-   else
-   {
-	  //Change back to original directory:
-	  if(chdir(old_dir) == -1)
-	  {
-#ifdef WIDE_CHAR_APP
-		 String str = "BEST_MESSAGE";
-		 wchar_t mes[] = L"Problem changing to old dir!";
-		 wchar_t cap[100];
-		 StringToWideChar(str,cap,99);
-
-		 MessageBox(NULL,mes,cap,0);
-#else
-        MessageBox(NULL,"Problem changing to old dir!",BEST_MESSAGE,
-                   MB_ICONEXCLAMATION);
-#endif
-	  }
-	  return;
-   }
-
-   //Initialise flag for <VAR> section
-   m_bVARPresent = true;
-   //Parse the animation program file
-   //parseTagFile();
-   parseTagFile1();
-
-   //Initialise variables for horizontal/vertical ref lines:
-	m_fHPos = 0.0;
-	m_fVPos = 0.0;
-
-	//Delete any previous instance of graphFrm:
-	if(m_GraphFrm != NULL)
-	{
-	   delete m_GraphFrm;
-	   m_GraphFrm = NULL;
-	}
-
-
-   //Launch the animation production process:
-   m_bAnimation = true;
-   m_iAniCnt = 1;
-   m_iAniCumCnt = 1;
-   m_iMaxTotAniCnt = 0;
-   m_bStartTimer1 = true;
-   Timer1->Enabled = true;
-
-}
-
-void TEasyPlotForm::setUpSubDir()
-{
-
-      //Create required subdir for target files:
-	  char tmp[10];
-
-	  getDirectoryTag();
-	  m_iDirCnt = 1;
-	  m_iAniCumCnt = 1;
-	 itoa(m_iDirCnt,tmp,10);
-	 char dir[200];
-	 sprintf(dir,"%s%s%s%s",m_sMovieTargetRoot,"\\",m_sDirTag,tmp);
-	 strcpy(m_sMovieTarget,dir);
-	 if(!DirectoryExists(m_sMovieTarget))
-	 {
-		if( mkdir(m_sMovieTarget) == -1 )
-		{
-#ifdef WIDE_CHAR_APP
-			String str = "BEST_MESSAGE";
-			wchar_t mes[] = L"Problem creating target sub-directory.";
-			wchar_t cap[100];
-			StringToWideChar(str,cap,99);
-
-			MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
-#else
-            MessageBox(NULL,"Problem creating target sub-directory.",
-                       BEST_MESSAGE,MB_ICONEXCLAMATION);
-#endif
-
-
-		}
-	 }
-
-	  //Change back to original directory:
-	  //if(chdir(old_dir) == -1)
-	  if(chdir(m_sOldDir) == -1)
-	  {
-#ifdef WIDE_CHAR_APP
-
-		 String str = "BEST_MESSAGE";
-		 wchar_t mes[] = L"Problem changing to old dir!";
-		 wchar_t cap[100];
-		 StringToWideChar(str,cap,99);
-
-		 MessageBox(NULL,mes,cap,0);
-#else
-         MessageBox(NULL,"Problem changing to old dir!",
-                       BEST_MESSAGE,MB_ICONEXCLAMATION);
-#endif
-
-	  }
-
-
-
-
-}//setUpSubDir
-
-
-
-//---------------------------------------------------------------------------
-
-void __fastcall TEasyPlotForm::File1Click(TObject *Sender)
-{
-   //TBD
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TEasyPlotForm::Close1Click(TObject *Sender)
-{
-   LPCTSTR path = "Help\\easyplotter.hlp";
-   WinHelp(Handle,path,HELP_QUIT,0);
-   Close();
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TEasyPlotForm::HelpTopics1Click(TObject *Sender)
-{
-   //Launch EasyPlotter Help
-   //APPLaunch app;
-
-   LPCTSTR path = "Help\\easyplotter.hlp";
-   WinHelp(Handle,path,HELP_FINDER,0);
-
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TEasyPlotForm::Open1Click(TObject *Sender)
-{
-   Button4Click(Sender);
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TEasyPlotForm::Timer1Timer(TObject *Sender)
-{
-   
-   char mes[200],index[10];
-
-   //Timer control for animation effects:
-
-   //Close the previous graph
-
-   if(m_GraphFrm != NULL)
-   {
-
-
-	  //Message to status bar:
-	  if(!m_bOverride)
-	  {
-		itoa(m_iAniCnt,index,10);
-	  }
-	  else
-	  {
-		itoa(m_iAniCumCnt,index,10);
-	  }
-
-	  sprintf(mes,"%s%s%s","Processing movie still  ",index," ..........");
-	  StatusBar1->Panels->Items[1]->Text = mes;
-
-	  //Produce bitmap of current graph:
-	  char filename[200],tmp[10];
-	  if(!m_bOverride)
-	  {
-		itoa(m_iAniCnt,tmp,10);
-
-	  }
-	  else
-	  {
-		itoa(m_iAniCumCnt,tmp,10);
-	  }
-	  sprintf(filename,"%s%s%s%s%s",m_sMovieTarget,"\\",m_sMovieTag,tmp,".bmp");
-	  m_GraphFrm->getImage()->Picture->SaveToFile(filename);
-
-	  //Delete graph instance:
-	  delete m_GraphFrm;
-	  m_GraphFrm = NULL;
-
-	  m_iAniCnt++;
-	  m_iAniCumCnt++;
-
-	  //if(m_iTagFileCount == m_iDirCnt)
-	  if(m_iDirCnt > m_iTagFileCount)
-	  {
-		 Timer1->Enabled = false;
-		 m_bAnimation = false;
-		 //Message to status bar:
-		 sprintf(mes,"%s","Processing of movie stills has been completed!");
-		 StatusBar1->Panels->Items[1]->Text = mes;
-		 //MessageBox(NULL,"Movie stills have been completed.",BEST_MESSAGE,MB_ICONINFORMATION);
-		 m_bFileIgnore = false;
-		 return;
-	  }
-
-   }
-
-   //Launch plot routine
-	PlotBtnClick(Sender);
-	if(m_bStartTimer1)
-	{
-	   m_bStartTimer1 = false;
-	   //m_iAniCnt++;
-	   //m_iAniCumCnt++;
-	}
-
-   //Set required no of points to plot and keep record
-   //if(m_iAniCnt > m_iTotAniCnt)
-
-   if(m_iAniCnt > m_iMaxTotAniCnt)
-   {
-	  //Perform any other animations required here:
-	  if(m_iTagFileCount == m_iDirCnt)
-	  {
-		  /*
-		  Timer1->Enabled = false;
-		  m_bAnimation = false;
-		 //Message to status bar:
-		 sprintf(mes,"%s","Processing of movie stills has been completed!");
-		 StatusBar1->Panels->Items[1]->Text = mes;
-		 //MessageBox(NULL,"Movie stills have been completed.",BEST_MESSAGE,MB_ICONINFORMATION);
-		 m_bFileIgnore = false;
-		 */
-		 m_iDirCnt++;
-	  }
-	  else
-	  {
-			 //Prepare for next program tag file and create next sub dir:
-			 char tmp[10];
-
-			 getDirectoryTag();
-			 m_iDirCnt++;
-			itoa(m_iDirCnt,tmp,10);
-			if(!m_bOverride)
-			{
-				char dir[200];
-				sprintf(dir,"%s%s%s%s",m_sMovieTargetRoot,"\\",m_sDirTag,tmp);
-				strcpy(m_sMovieTarget,dir);
-				if(!DirectoryExists(m_sMovieTarget))
-				{
-				   if( mkdir(dir) == -1 )
-				   {
-#ifdef WIDE_CHAR_APP
-					   String str = "BEST_MESSAGE";
-					   wchar_t mes[] = L"Problem creating target sub-directory.";
-					   wchar_t cap[100];
-					   StringToWideChar(str,cap,99);
-
-					   MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
-#else
-                       MessageBox(NULL,"Problem creating target sub-directory.",
-                                  BEST_MESSAGE,MB_ICONEXCLAMATION);
-#endif
-
-				   }
-				}
-			}
-			//Initialise flag for <VAR> section
-			 m_bVARPresent = true;
-			 m_iMaxTotAniCnt = 0;
-			 //Parse the animation program file
-			 //Get new tag file name:
-
-			 //wchar_t wstr[100] = L"hello world";
-			 char str[200];
-#ifdef WIDE_CHAR_APP
-			 wcstombs(str, m_SLTagFiles->Strings[m_iDirCnt-1].c_str(),199);
-#else
-             strcpy(str, m_SLTagFiles->Strings[m_iDirCnt-1].c_str());
-#endif
-			 //strcpy(m_sTagFile,m_SLTagFiles->Strings[m_iDirCnt-1].c_str());
-			 strcpy(m_sTagFile,str);
-			 //parseTagFile();
-			 parseTagFile1();
-
-			 //Initialise variables for horizontal/vertical ref lines:
-			  m_fHPos = 0.0;
-			  m_fVPos = 0.0;
-
-			 m_iAniCnt = 0;//1;
-
-	  }
-   }
-
-
-
-}
-//---------------------------------------------------------------------------
-
-
-void TEasyPlotForm::parseTagFile1()
-{
-   char contents[9000];
-   char ch[2];
-
-   m_bProcFIXED = false;
-   m_bProcVAR = false;
-   bool m_bValid = true;
-
-   if( (m_fpTagFile=fopen(m_sTagFile,"rt")) == NULL)
-   {
-	  //char mes[200];
-	  //sprintf(mes,"%s%s","Cannot open required Animation Program File.\n",
-	  //		  "Please try again.");
-#ifdef WIDE_CHAR_APP
-	  String str = "BEST_MESSAGE";
-	  wchar_t mes[] = L"Cannot open required Animation Program File.\nPlease try again.";
-	  wchar_t cap[100];
-	  StringToWideChar(str,cap,99);
-
-	  MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
-	  //return;
-	  exit(1);
-#else
-      MessageBox(NULL,"Cannot open required Animation Program File.\nPlease try again.",
-                 BEST_MESSAGE,MB_ICONEXCLAMATION);
-	  //return;
-	  exit(1);
-#endif
-   }
-   //Read contents of file:
-   int byteCnt = 0;
-   while( !feof(m_fpTagFile))
-   {
-	  fread(ch,sizeof(char),1,m_fpTagFile);
-	  contents[byteCnt] = ch[0];
-	  //contents++;
-	 byteCnt++;
-   }
-   contents[byteCnt] = '\0';
-   fclose(m_fpTagFile);
-
-   //Search for <FIXED> section
-   m_bProcFIXED = true;
-   m_iNumFIXEDPlots = 0;
-   char *fixed_ptr1 = NULL;
-   char *fixed_ptr2 = NULL;
-   char fixed_str[1000];
-   if( strstr(contents,"<FIXED>") != NULL)
-   {
-	  //Process <FIXED> animation instructions:
-	  fixed_ptr1 = strstr(contents,"<FIXED>");
-	  fixed_ptr2 = strstr(contents,"</FIXED>");
-	  int len = strlen(fixed_ptr1) - strlen(fixed_ptr2);
-	  strcpy(fixed_str,fixed_ptr1);
-	  fixed_str[len-1] = '\0';
-
-
-	  //Parsing the <FIXED> instructions
-
-
-	  int fixedCnt = 0;
-	  bool plotExcess = false;
-	  for(int i=0;i<m_iNumPlotTypes;i++)
-	  {
-		 char *p = NULL;
-		 p= fixed_str;
-		 if(plotExcess) break;
-
-		  while( strstr(p,m_sPLOTTYPES[i]) != NULL )
-		 {
-			strcpy(m_sFIXED[fixedCnt],m_sPLOTTYPES[i]);
-			p = strstr(p,m_sFIXED[fixedCnt]);
-			//Get the argument list:
-			//if( !getArgList(p,fixedCnt) )
-			if( !getArgList1(p,fixedCnt) )
-			{
-			   //Problem with argument list:
-			   return;
-			}
-
-			//Advance to end of parameter list:
-			p = strstr(p,";");
-			fixedCnt++;
-			if(fixedCnt == MAX_NUM_FIXEDPLOTS)
-			{
-			   plotExcess = true;
-			   m_iNumFIXEDPlots = MAX_NUM_FIXEDPLOTS;
-			}
-			else
-			{
-			  m_iNumFIXEDPlots = fixedCnt;
-			}
-			if(p==NULL) break;
-		 }//while
-
-	  }//i
-
-
-   }//<FIXED>
-
-
-
-   if( strstr(contents,"<VAR>") == NULL)
-   {
-
-	  String str = "BEST_MESSAGE";
-	  wchar_t mes[] = L"Warning: A <VAR> section has not been defined in tag file.\nOK.";
-	  wchar_t cap[100];
-	  StringToWideChar(str,cap,99);
-
-	  //MessageBox(NULL,mes,cap,MB_ICONINFORMATION);
-	  m_bVARPresent = false;
-	  m_iTotAniCnt = 1;  //Prevent stills series production:
-	  return;
-   }
-   else
-   {
-		//Search for <VAR> section
-	   m_bProcVAR = true;
-	   m_bProcFIXED = false;
-	   m_iNumVARPlots = 0;
-	   char *var_ptr1 = NULL;
-	   char *var_ptr2 = NULL;
-	   char var_str[1000];
-	   if( strstr(contents,"<VAR>") != NULL)
-	   {
-		  //Process <VAR> animation instructions:
-		  var_ptr1 = strstr(contents,"<VAR>");
-		  var_ptr2 = strstr(contents,"</VAR>");
-		  int len = strlen(var_ptr1) - strlen(var_ptr2);
-		  strcpy(var_str,var_ptr1);
-		  var_str[len-1] = '\0';
-
-
-		  //Parsing the <VAR> instructions
-		  int varCnt = 0;
-		  bool plotExcess = false;
-		  for(int i=0;i<m_iNumPlotTypes;i++)
-		  {
-			 char *p = NULL;
-			 p= var_str;
-			 if(plotExcess) break;
-
-			  while( strstr(p,m_sPLOTTYPES[i]) != NULL )
-			 {
-				strcpy(m_sVAR[varCnt],m_sPLOTTYPES[i]);
-				p = strstr(p,m_sVAR[varCnt]);
-				//Get the argument list:
-				//if( !getArgList(p,fixedCnt) )
-				if( !getArgList1(p,varCnt) )
-				{
-				   //Problem with argument list:
-				   return;
-				}
-				m_bValid = true;
-				//Advance to end of parameter list:
-				p = strstr(p,";");
-				varCnt++;
-				if(varCnt == MAX_NUM_VARPLOTS)
-				{
-				   plotExcess = true;
-				   m_iNumVARPlots = MAX_NUM_VARPLOTS;
-				}
-				else
-				{
-				  m_iNumVARPlots = varCnt;
-				}
-				if(p==NULL) break;
-			 }//while
-
-		  }//i
-
-	   }
-
-   }//else (VAR)
-
-   if(!m_bValid)
-  {
-	 //char mes[200];
-	 //sprintf(mes,"%s%s","A valid plot instruction has not been defined in tag file.\n",
-	 //		"                     OK ");
-
-#ifdef WIDE_CHAR_APP
-	 String str = "BEST_MESSAGE";
-	 wchar_t mes[] = L"A valid plot instruction has not been defined in tag file.\nOK ";
-	 wchar_t cap[100];
-	 StringToWideChar(str,cap,99);
-
-	 MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
-	 return;
-#else
-     MessageBox(NULL,"A valid plot instruction has not been defined in tag file.\nOK ",
-                BEST_MESSAGE,MB_ICONEXCLAMATION);
-	 return;
-#endif
-  }
-
-}//parseTagFile1()
-
-bool TEasyPlotForm::getArgList1(char *p,int index)
-{
-
-   char ch[2],tmp[100];
-
-   //Check that an end of parameter list delimiter is present
-   if( strstr(p,";") == NULL)
-   {
-	   //char mes[200];
-	   //sprintf(mes,"%s%s","An end of argument list delimiter is not present.\n",
-	   //		  "Please edit the program file.");
-
-#ifdef WIDE_CHAR_APP
-	  String str = "BEST_MESSAGE";
-	  wchar_t mes[] = L"An end of argument list delimiter is not present.\nPlease edit the program file. ";;
-	  wchar_t cap[100];
-	  StringToWideChar(str,cap,99);
-
-	  MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
-
-	  return false;
-#else
-      MessageBox(NULL,"An end of argument list delimiter is not present.\nPlease edit the program file. "
-                ,BEST_MESSAGE,MB_ICONEXCLAMATION);
-
-	  return false;
-#endif
-
-   }
-
-
-   //if(m_bProcVAR)
-   //{
-
-	  //Set pointer and initialise argument list:
-	  if(m_bProcVAR)
-	  {
-		 //for(int k=0;k<strlen(m_sVARSingle);k++) p++;
-		 //for(int i=0;i<MAX_ARGS;i++) strcpy(m_sVARSingleParams[i],"");
-		 for(int k=0;k<strlen(m_sVAR[index]);k++) p++;
-		 for(int i=0;i<MAX_ARGS;i++) strcpy(m_sVARParams[index][i],"");
-	  }
-	  else if(m_bProcFIXED)
-	  {
-		 for(int k=0;k<strlen(m_sFIXED[index]);k++) p++;
-		 for(int i=0;i<MAX_ARGS;i++) strcpy(m_sFIXEDParams[index][i],"");
-	  }
-
-	  bool arg_parsing = true;
-
-	  strcpy(tmp,"");
-	  int argCnt = 0;
-	  int charCnt = 0;
-	  while (arg_parsing)
-	  {
-		 ch[0] = p[charCnt];
-		 ch[1] = '\0';
-		 if( (ch[0] != ',') )
-		 {
-			if( ch[0] != ';')
-			{
-			   strcat(tmp,ch);
-			   charCnt++;
-			}
-			else
-			{
-			   if(m_bProcVAR)
-			   {
-				  strcpy(m_sVARParams[index][argCnt],tmp);
-			   }
-			   else if(m_bProcFIXED)
-			   {
-				  strcpy(m_sFIXEDParams[index][argCnt],tmp);
-			   }
-			   //MessageBox(NULL,m_sVARParams[argCnt],"",0);
-			}
-		 }
-		 else
-		 {
-			if(m_bProcVAR)
-			{
-			   strcpy(m_sVARParams[index][argCnt],tmp);
-			}
-			else if(m_bProcFIXED)
-			{
-			   strcpy(m_sFIXEDParams[index][argCnt],tmp);
-			}
-			//MessageBox(NULL,m_sVARParams[argCnt],"",0);
-			strcpy(tmp,"");
-			argCnt++;
-			charCnt++;
-		 }
-
-		 //Terminate parsing
-		 if(ch[0] == ';')
-		 {
-			arg_parsing = false;
-			//Define final argument count:
-			m_iNumArgs = argCnt+1;
-			if(m_bProcFIXED)
-			{
-				m_iNumFIXEDPlotArgs[index] = m_iNumArgs;
-			}
-			if(m_bProcVAR)
-			{
-				m_iNumVARPlotArgs[index] = m_iNumArgs;
-			}
-		 }
-
-
-	  }//while
-   //}
-
-   return true;
-
-}//getArgList
-
-
-void __fastcall TEasyPlotForm::previewBtnClick(TObject *Sender)
-{
-
-   int intvar, index;
-   char tmp[20], filename[200], fStr[20];
-
-  //Read in slide and get dimensions:
-  //Set up required image canvas:
-  if(m_ImMovie == NULL)
-  {
-	m_ImMovie = new TImage(this);
-  }
-
-  //Get the directory tag:
-  getDirectoryTag();
-
-  m_iPreviewIndex = m_iPreviewIndexStart;
-  itoa(m_iPreviewIndex,tmp,10);
-  sprintf(fStr,"%s%s",m_sMovieTag,tmp);
-  m_iDirCnt = 1;
-  itoa(m_iDirCnt,tmp,10);
-  sprintf(filename,"%s%s%s%s%s%s%s", m_sMovieTargetRoot,"\\",m_sDirTag,tmp,"\\",fStr,".bmp");
-
-  FILE *fp;
-  if( (fp=fopen(filename,"rb")) == NULL )
-  {
-
-#ifdef WIDE_CHAR_APP
-	  String str = "BEST_MESSAGE";
-	  wchar_t mes[] = L"Cannot open specified files.";
-	  wchar_t cap[100];
-	  StringToWideChar(str,cap,99);
-      MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
-	  return;
-#else
-      MessageBox(NULL,"Cannot open specified files.",BEST_MESSAGE,MB_ICONEXCLAMATION);
-	  return;
-#endif
-
-  }
-  fclose(fp);
-
-  StatusBar1->Panels->Items[0]->Text = "Preview mode";
-  StatusBar1->Panels->Items[1]->Text = "";
-
-  /*
-  if(m_bDisableGraphMenu)
-  {
-	   //Inform user that the DELETE button needs to be pressed to close the form;
-	   String str = BEST_MESSAGE;
-	   wchar_t mes[] = L"In this Graph Mode, the menu and top border controls are not available.\nYou may close the form by pressing the DELETE button.";
-	   wchar_t cap[100];
-	   StringToWideChar(str,cap,99);
-	   MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
-  }
-  */
-
-  m_ImMovie->Picture->LoadFromFile(filename);
-
-   //Preview slide:
-   TBorderStyle bStyle;
-   if(m_bDisableGraphMenu)
-   {
-	   //Removes top border area
-	   bStyle = bsNone;
-   }
-   else
-   {
-	 bStyle = bsSizeable;
-   }
-   m_MovieForm = new TMovieForm(this,m_ImMovie,m_ImMovie->Picture->Height,
-									  m_ImMovie->Picture->Width,Timer2,bStyle);
-   m_MovieForm->Show();
-
-   Timer2->Interval = m_iPreviewInt;
-   if(!m_bMovieControl)
-   {
-	Timer2->Enabled = true;
-   }
-   else
-   {
-	Timer2->Enabled = false;
-
-   }
-
-}
-//---------------------------------------------------------------------------
-void TEasyPlotForm::getDirectoryTag()
-{
-
-  #ifdef WIDE_CHAR_APP
-   int cnt = 0;
-  strcpy(m_sDirTag,"");
-  //for(int i=strlen(m_sMovieTargetRoot);i>=0;i--)
-  for(int i=wcslen(m_swMovieTargetRoot);i>=0;i--)
-  {
-	if(m_swMovieTargetRoot[i] != '\\')
-	{
-	   cnt++;
-	}
-	else
-	{
-	  break;
-	}
-
-  }
-  //int len = strlen(m_sMovieTargetRoot)-cnt;
-  int len = wcslen(m_swMovieTargetRoot)-cnt;
-  for(int i=0;i<cnt;i++)
-  {
-	  m_sDirTag[i] = m_swMovieTargetRoot[len+1+i];
-  }
-
-#else
-
-   int cnt = 0;
-  strcpy(m_sDirTag,"");
-  for(int i=strlen(m_sMovieTargetRoot);i>=0;i--)
-  {
-    if(m_sMovieTargetRoot[i] != '\\')
-    {
-       cnt++;
-    }
-    else
-    {
-      break;
-    }
-
-  }
-  int len = strlen(m_sMovieTargetRoot)-cnt;
-  for(int i=0;i<cnt;i++)
-  {
-      m_sDirTag[i] = m_sMovieTargetRoot[len+1+i];
-  }
-
-#endif
-
-
-
-
-}//getDirectoryTag
-
-
-
-void __fastcall TEasyPlotForm::Timer2Timer(TObject *Sender)
-{
-
-
-   int intvar, index;
-   char tmp[20], filename[200], fStr[20];
-
-   m_bProgrammedControl = true; //Set here temporarily
-
-   //Get the next preview slide:
-   if(m_ImMovie != NULL)
-   {
-	 delete m_ImMovie;
-	 m_ImMovie = new TImage(this);
-   }
-
-   m_iPreviewIndex++;
-   itoa(m_iPreviewIndex,tmp,10);
-   sprintf(fStr,"%s%s",m_sMovieTag,tmp);
-   itoa(m_iDirCnt,tmp,10);
-   sprintf(filename,"%s%s%s%s%s%s%s", m_sMovieTargetRoot,"\\",m_sDirTag,tmp,"\\",fStr,".bmp");
-
-   FILE *fp;
-   if( (fp=fopen(filename,"rb")) == NULL )
-   {
-		 //Find next set of stills in next directory:
-		 m_iDirCnt++;
-		 itoa(m_iDirCnt,tmp,10);
-		 char dir[200];
-		 sprintf(dir,"%s%s%s%s", m_sMovieTargetRoot,"\\",m_sDirTag,tmp);
-		 if(DirectoryExists(dir))
-		 {
-			m_iPreviewIndex = 0;
-			return;
-		 }
-		 else
-		 {
-			//No more directories available - end process:
-			Timer2->Enabled = false;
-			StatusBar1->Panels->Items[0]->Text = "Preview mode";
-			StatusBar1->Panels->Items[1]->Text = "Preview completed";
-			return;
-
-		 }
-
-   }
-   fclose(fp);
-   m_ImMovie->Picture->LoadFromFile(filename);
-
-   //Preview slide:
-	m_MovieForm->Update(m_ImMovie,m_ImMovie->Picture->Height,
-					   m_ImMovie->Picture->Width);
-
-	char mes[200];
-	itoa(m_iPreviewIndex,tmp,10);
-	sprintf(mes,"%s%s%s","Previewing movie still  ",tmp," ..........");
-	StatusBar1->Panels->Items[1]->Text = mes;
-
-	if(m_bMovieControl && m_bProgrammedControl)
-	{
-		if(checkForPrompt()) //Check for programmed pause control points
-		{
-		   Timer2->Enabled = false;
-
-		}//checkForPrompt()
-	}
-
-
-}
-
-bool TEasyPlotForm::checkForPrompt()
-{
-
-   bool contflg = false;
-   //Check that a control index list exsists:
-   if(m_SLContIndex != NULL)
-   {
-
-	   for(int i=0;i<m_SLContIndex->Count;i++)
-	   {
-		 if(m_iPreviewIndex == m_SLContIndex->Strings[i])
-		 {
-			contflg = true;
-			break;
-		 }
-
-	   }//i
-   }
-   return contflg;
-
-}//checkForPrompt
-
-
-void __fastcall TEasyPlotForm::SelPrevBtnClick(TObject *Sender)
-{
-   
-   int intvar, index;
-   char tmp[20], filename[200], fStr[20];
-
-  //Read in slide and get dimensions:
-  //Set up required image canvas:
-  if(m_ImMovie == NULL)
-  {
-	m_ImMovie = new TImage(this);
-  }
-
-  //Get the directory tag:
-  getDirectoryTag();
-
-
-  m_iPreviewIndex = m_iPreviewIndexStart;
-
-  itoa(m_iPreviewIndex,tmp,10);
-  sprintf(fStr,"%s%s",m_sMovieTag,tmp);
-  m_iDirCnt = 1;
-  itoa(m_iDirCnt,tmp,10);
-  sprintf(filename,"%s%s%s%s%s%s%s", m_sMovieTargetRoot,"\\",m_sDirTag,tmp,"\\",fStr,".bmp");
-
-
-
-  FILE *fp;
-  if( (fp=fopen(filename,"rb")) == NULL )
-  {
-#ifdef WIDE_CHAR_APP
-	  String str = "BEST_MESSAGE";
-	  wchar_t mes[] = L"Cannot open specified files.";
-	  wchar_t cap[100];
-	  StringToWideChar(str,cap,99);
-
-	  MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
-	  return;
-#else
-      MessageBox(NULL,"Cannot open specified files.",BEST_MESSAGE,MB_ICONEXCLAMATION);
-	  return;
-#endif
-
-  }
-  fclose(fp);
-
-  StatusBar1->Panels->Items[0]->Text = "Preview mode";
-  StatusBar1->Panels->Items[1]->Text = "";
-  /*
-  if(m_bDisableGraphMenu)
-  {
-	   //Inform user that the DELETE button needs to be pressed to close the form;
-	   String str = BEST_MESSAGE;
-	   wchar_t mes[] = L"In this Graph Mode, the menu and top border controls are not available.\nYou may close the form by pressing the DELETE button.";
-	   wchar_t cap[100];
-	   StringToWideChar(str,cap,99);
-	   MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
-  }
-  */
-
-  m_ImMovie->Picture->LoadFromFile(filename);
-
-   //Preview slide:
-   TBorderStyle bStyle;
-   if(m_bDisableGraphMenu)
-   {
-	   //Removes top border area
-	   bStyle = bsNone;
-   }
-   else
-   {
-	 bStyle = bsSizeable;
-   }
-   m_MovieForm = new TMovieForm(this,m_ImMovie,m_ImMovie->Picture->Height,
-									  m_ImMovie->Picture->Width,Timer2,bStyle);
-   m_MovieForm->Show();
-
-   Timer2->Interval = m_iPreviewInt;
-   if(!m_bMovieControl)
-   {
-	Timer2->Enabled = true;
-   }
-   else
-   {
-	Timer2->Enabled = false;
-
-   }
-
-
-}
-
-
-//---------------------------------------------------------------------------
-#else      //LINUX INTEGRATED CODE STARTS HERE
 //---------------------------------------------------------------------------
 void __fastcall TEasyPlotForm::animateBtnClick(TObject *Sender)
 {
@@ -6216,7 +5056,7 @@ void __fastcall TEasyPlotForm::previewBtnClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TEasyPlotForm::getDirectoryTag()
 {
-    
+
 #ifdef WIDE_CHAR_APP
    int cnt = 0;
   strcpy(m_sDirTag,"");
@@ -6261,7 +5101,7 @@ void TEasyPlotForm::getDirectoryTag()
   {
       m_sDirTag[i] = m_sMovieTargetRoot[len+1+i];
   }
-  
+
 #endif
 
 }//getDirectoryTag
@@ -6449,6 +5289,5 @@ void __fastcall TEasyPlotForm::SelPrevBtnClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-#endif
 
 

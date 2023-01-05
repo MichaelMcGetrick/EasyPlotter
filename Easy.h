@@ -28,9 +28,9 @@
 #include <windows.h>
 
 
-#if !defined(ORI_WIN_CODE)
-//#include "RC_Filter_Averaging/RC_Combined.h"
-#include "Tiller/tiller.h"
+#if !defined(LINUX_ANIMATION)
+//#include "Tiller/tiller.h"
+#include "ByPassCaps/bypass_cap.h"
 #endif
 
 #define MAX_NUM_DATASETS 3
@@ -38,11 +38,6 @@
 #define MAX_NUM_VARPLOTS 30
 #define MAX_NUM_PLOTTYPES 45
 #define MAX_ARGS 20
-
-
-#if !defined(ORI_WIN_CODE)
-
-#endif
 
 
 
@@ -119,7 +114,7 @@ __published:	// IDE-managed Components
    void __fastcall previewBtnClick(TObject *Sender);
    void __fastcall Timer2Timer(TObject *Sender);
     void __fastcall SelPrevBtnClick(TObject *Sender);
-   
+
 private:	// User declarations
  int m_iLogPlotMode;
  int m_iWidth, m_iHeight;
@@ -271,8 +266,8 @@ public:		// User declarations
    bool checkForPrompt();
 
 
-// Add additional functions if running in Linux integrated mode
-#if !defined(ORI_WIN_CODE)
+// Add additional functions if running standard statoc graphics
+#if !defined(LINUX_ANIMATION)
 //--------------------------------------------------------------------------
 // Define data arrays for Linux integrated code
 //-------------------------------------------------------------------------

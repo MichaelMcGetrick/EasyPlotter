@@ -46,7 +46,7 @@ void A_Text::left2right()
 	 m_vArgs[7][0] = toupper(m_vArgs[7][0]);
 	 //m_vArgs[8][0] = toupper(m_vArgs[8][0]);
 	 //Set color:
-	 m_Graph->getImage()->Canvas->Font->Color =  setColor(m_vArgs[7].c_str());
+	 m_Graph->getImage()->Canvas->Font->Color =  setColor1(m_vArgs[7].c_str());
 	 //Set text background color
 	 m_Graph->getImage()->Canvas->Brush->Color =  setColor1(m_vArgs[8].c_str());
 
@@ -68,7 +68,7 @@ void A_Text::left2right()
 	 m_vArgs[7][0] = toupper(m_vArgs[7][0]);
 	 //m_vArgs[8][0] = toupper(m_vArgs[8][0]);
 	 //Set color:
-	 m_Graph->getImage()->Canvas->Font->Color =  setColor(m_vArgs[7].c_str());
+	 m_Graph->getImage()->Canvas->Font->Color =  setColor1(m_vArgs[7].c_str());
 	 //Set text background color
 	 m_Graph->getImage()->Canvas->Brush->Color =  setColor1(m_vArgs[8].c_str());
 
@@ -106,7 +106,7 @@ void A_Text::upDown()
 	 //Change to required color:
 	 m_vArgs[7][0] = toupper(m_vArgs[7][0]);
 	 //Set color:
-	 m_Graph->getImage()->Canvas->Font->Color =  setColor(m_vArgs[7].c_str());
+	 m_Graph->getImage()->Canvas->Font->Color =  setColor1(m_vArgs[7].c_str());
 	 //Set text background color
 	 m_Graph->getImage()->Canvas->Brush->Color =  setColor1(m_vArgs[8].c_str());
 
@@ -128,7 +128,7 @@ void A_Text::upDown()
 	 //Change to required color:
 	 m_vArgs[7][0] = toupper(m_vArgs[7][0]);
 	 //Set color:
-	 m_Graph->getImage()->Canvas->Font->Color =  setColor(m_vArgs[7].c_str());
+	 m_Graph->getImage()->Canvas->Font->Color =  setColor1(m_vArgs[7].c_str());
 	 //Set text background color
 	 m_Graph->getImage()->Canvas->Brush->Color =  setColor1(m_vArgs[8].c_str());
 
