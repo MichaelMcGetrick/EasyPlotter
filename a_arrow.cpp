@@ -49,7 +49,7 @@ void A_Arrow::left2right()
 		//Change to required color:
 		m_vArgs[5][0] = toupper(m_vArgs[5][0]);
 		//Draw an arrow pointing to the right:
-		m_Graph->drawArrow(posx,posy,height,width,setColor(m_vArgs[5].c_str()),m_sArrowType);
+		m_Graph->drawArrow(posx,posy,height,width,setColor1(m_vArgs[5].c_str()),m_sArrowType);
 	  }
 	  else if( strcmp(m_sArrowType,"lARROW") == 0 )
 	  {
@@ -58,9 +58,9 @@ void A_Arrow::left2right()
 		height = atof(m_vArgs[4].c_str());
 
 		//Change to required color:
-		m_vArgs[5][0] = toupper(m_vArgs[5][0]);
+		//m_vArgs[5][0] = toupper(m_vArgs[5][0]);
 		//Draw an arrow pointing to the right:
-		m_Graph->drawArrow(posx,posy,height,width,setColor(m_vArgs[5].c_str()),m_sArrowType);
+        m_Graph->drawArrow(posx,posy,height,width,setColor1(m_vArgs[5].c_str()),m_sArrowType);
 	  }
 
    }
@@ -73,9 +73,9 @@ void A_Arrow::left2right()
 		height = atof(m_vArgs[4].c_str());
 
 		//Change to required color:
-		m_vArgs[5][0] = toupper(m_vArgs[5][0]);
+		//m_vArgs[5][0] = toupper(m_vArgs[5][0]);
 		//Draw an arrow pointing to the right:
-		m_Graph->drawArrow(posx,posy,height,width,setColor(m_vArgs[5].c_str()),m_sArrowType);
+		m_Graph->drawArrow(posx,posy,height,width,setColor1(m_vArgs[5].c_str()),m_sArrowType);
 	  }
 	  else if( strcmp(m_sArrowType,"lARROW") == 0 )
 	  {
@@ -84,9 +84,9 @@ void A_Arrow::left2right()
 		height = atof(m_vArgs[4].c_str());
 
 		//Change to required color:
-		m_vArgs[5][0] = toupper(m_vArgs[5][0]);
+        //m_vArgs[5][0] = toupper(m_vArgs[5][0]);
 		//Draw an arrow pointing to the right:
-		m_Graph->drawArrow(posx,posy,height,width,setColor(m_vArgs[5].c_str()),m_sArrowType);
+        m_Graph->drawArrow(posx,posy,height,width,setColor1(m_vArgs[5].c_str()),m_sArrowType);
 	  }
 
    }
@@ -117,9 +117,9 @@ void A_Arrow::upDown()
 		height = atof(m_vArgs[4].c_str());
 
 		//Change to required color:
-		m_vArgs[5][0] = toupper(m_vArgs[5][0]);
+		//m_vArgs[5][0] = toupper(m_vArgs[5][0]);
 		//Draw an arrow pointing to the right:
-		m_Graph->drawArrow(posx,posy,height,width,setColor(m_vArgs[5].c_str()),m_sArrowType);
+		m_Graph->drawArrow(posx,posy,height,width,setColor1(m_vArgs[5].c_str()),m_sArrowType);
 
 	  }
 	  else if( strcmp(m_sArrowType,"dARROW") == 0 )
@@ -131,7 +131,7 @@ void A_Arrow::upDown()
 		//Change to required color:
 		m_vArgs[5][0] = toupper(m_vArgs[5][0]);
 		//Draw an arrow pointing to the right:
-		m_Graph->drawArrow(posx,posy,height,width,setColor(m_vArgs[5].c_str()),m_sArrowType);
+		m_Graph->drawArrow(posx,posy,height,width,setColor1(m_vArgs[5].c_str()),m_sArrowType);
 
 	  }
 
@@ -147,7 +147,7 @@ void A_Arrow::upDown()
 		//Change to required color:
 		m_vArgs[5][0] = toupper(m_vArgs[5][0]);
 		//Draw an arrow pointing to the right:
-		m_Graph->drawArrow(posx,posy,height,width,setColor(m_vArgs[5].c_str()),m_sArrowType);
+		m_Graph->drawArrow(posx,posy,height,width,setColor1(m_vArgs[5].c_str()),m_sArrowType);
 
 	  }
 	  else if( strcmp(m_sArrowType,"dARROW") == 0 )
@@ -157,9 +157,9 @@ void A_Arrow::upDown()
 		height = atof(m_vArgs[4].c_str());
 
 		//Change to required color:
-		m_vArgs[5][0] = toupper(m_vArgs[5][0]);
+		//m_vArgs[5][0] = toupper(m_vArgs[5][0]);
 		//Draw an arrow pointing to the right:
-		m_Graph->drawArrow(posx,posy,height,width,setColor(m_vArgs[5].c_str()),m_sArrowType);
+		m_Graph->drawArrow(posx,posy,height,width,setColor1(m_vArgs[5].c_str()),m_sArrowType);
 
 	  }
 
