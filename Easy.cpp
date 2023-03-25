@@ -1278,6 +1278,7 @@ int TEasyPlotForm::readData()
 
     int retVal = 0;
 
+    strcpy (m_sDataFile,filename);
 
 	printf("Filename: %s\n",filename);
 	if( (fp=fopen(filename,"rt")) != NULL )
@@ -2089,15 +2090,19 @@ void TEasyPlotForm::plotWaveFile()
 
 
 #ifdef WIDE_CHAR_APP
+       /*
        //Inform user that the DELETE button needs to be pressed to close the form;
 	   String str = BEST_MESSAGE;
 	   wchar_t mes[] = L"In this Graph Mode, the menu and top border controls are not available.\nYou may close the form by pressing the DELETE button.";
 	   wchar_t cap[100];
 	   StringToWideChar(str,cap,99);
 	   MessageBox(NULL,mes,cap,MB_ICONEXCLAMATION);
+       */
 #else
+      /*
       MessageBox(NULL,"In this Graph Mode, the menu and top border controls are not available.\nYou may close the form by pressing the DELETE button."
                  ,BEST_MESSAGE,MB_ICONEXCLAMATION);
+      */           
 #endif
 
 

@@ -30,7 +30,8 @@
 
 #if !defined(LINUX_ANIMATION)
 //#include "Tiller/tiller.h"
-#include "ByPassCaps/bypass_cap.h"
+//#include "ByPassCaps/bypass_cap.h"
+#include "ClipIR_Auto_Detect/clipir.h"
 #endif
 
 #define MAX_NUM_DATASETS 3

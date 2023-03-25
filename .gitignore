@@ -30,4 +30,5 @@ Ini/EasyPlotter.ori
 LinuxModule/
 RC_Filter_Averaging/
 Tiller/
-
+ClipIR_Auto_Detect/
+ByPassCaps/
