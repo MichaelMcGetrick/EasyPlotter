@@ -1569,9 +1569,15 @@ void TGraphForm::drawVerticalMarker(float pos, int color,int width)
 
 	//int width: 0: standard 1 pixel; 1: 3 pixel width
 
+    if(logPlotMode == 1 || logPlotMode == 3)
+    {
+       pos = log10(pos);
+
+    }
+
+
 	// Draws a vertical marker line at the requested postion
-	if(logPlotMode == 0 || logPlotMode == 2)
-  	{
+
       if ((pos >= xmin) && (pos <= xmax))
       {
 			C1 = ( (pos-xmin) / (xmax-xmin) )* (right-left);
@@ -1596,7 +1602,7 @@ void TGraphForm::drawVerticalMarker(float pos, int color,int width)
 
 	  }
 
-   }
+
 
 
 }// drawVerticalMarker
@@ -2996,44 +3002,59 @@ void __fastcall TGraphForm::Save1Click(TObject *Sender)
    old_dir[0] = 'A' + getdisk();
    getcurdir(0,old_dir+3);
 
-
-   if( (!strcmp(m_sFileExt,"spe")) || (!strcmp(m_sFileExt,"txt")) ||
-       (!strcmp(m_sFileExt,"dat")) || (!strcmp(m_sFileExt,"csv"))  )
+   if (m_bIsWaveFile == false)
    {
-       strcpy(fileName,"");// Let user define filename in save dialog box
+      // File extension has not been defined - wavefile option processed earlier
+      strcpy (m_sFile, filename);
+
+      char *pstr;
+      int len;
+
+      //Check the file extension:
+      len = strlen(m_sFile);
+      pstr = strchr(m_sFile,'.');
+      pstr++;
+      strcpy(m_sFileExt,pstr);
+
+   }
+
+   bool search = true;
+   if (m_bIsWaveFile)
+   {
+      ps = strchr(Title,'.');
    }
    else
    {
-      bool search = true;
-      ps = strchr(Title,'.');
-      while(search)
-      {
-        ps--;
-        if( strchr(ps,'\\') )
-        {
-            search = false;
-            ps++;
-            strcpy(fileName,ps);
-            bool scan = true;
-            int i=0;
-            while( scan )
-            {
-              if(fileName[i] == '.')
-              {
-                 scan = false;
-                 fileName[i+1] = 'b';
-                 fileName[i+2] = 'm';
-                 fileName[i+3] = 'p';
-                 fileName[i+4] = '\0';
-              }
-              else
-              {
-               i++;
-              }
-            }//while
-        }
-      }//while
+      ps = strchr(m_sFile,'.');
    }
+   while(search)
+   {
+     ps--;
+     if( (strchr(ps,'\\')) || (strchr(ps,'/')) )
+     {
+         search = false;
+         ps++;
+         strcpy(fileName,ps);
+         bool scan = true;
+         int i=0;
+         while( scan )
+         {
+           if(fileName[i] == '.')
+           {
+              scan = false;
+              fileName[i+1] = 'b';
+              fileName[i+2] = 'm';
+              fileName[i+3] = 'p';
+              fileName[i+4] = '\0';
+           }
+           else
+           {
+             i++;
+           }
+         }//while
+      }
+   }//while
+
 
    SaveDialog1->DefaultExt = "bmp";
    SaveDialog1->Filter = "bmp";
@@ -4987,6 +5008,7 @@ void __fastcall TGraphForm::FormKeyDown(TObject *Sender, WORD &Key, TShiftState 
 
 
 }
+
 
 
 
