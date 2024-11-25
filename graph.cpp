@@ -3892,7 +3892,7 @@ void TGraphForm::redrawData1()
 				{
 					if (!_isnan(EasyPlotForm->data2[i])) // Do not plot NAN numbers
 					{
-						graphFrm->plotSig(EasyPlotForm->data2[i],EasyPlotForm->data1[i],PLOT1_COLOR);
+						plotSig(EasyPlotForm->data2[i],EasyPlotForm->data1[i],PLOT1_COLOR);
 					}
 
 				}
