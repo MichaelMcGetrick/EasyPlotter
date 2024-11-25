@@ -1299,7 +1299,7 @@ int TEasyPlotForm::readData()
 				              &data4[i]);
 #endif
 #if NUM_PLOTS == 4
-				ret = fscanf(fp,"%f %f %f %f\n",&data1[i],&data2[i],&data3[i],
+				ret = fscanf(fp,"%f %f %f %f %f\n",&data1[i],&data2[i],&data3[i],
 				              &data4[i],&data5[i]);
 #endif
 
@@ -1311,6 +1311,7 @@ int TEasyPlotForm::readData()
 				i++;
 
 			}
+
 			fclose(fp);
 			NumDataSets = i;
 
@@ -1362,6 +1363,7 @@ void TEasyPlotForm::doGraph()
 	 	graphFrm->drawVerticalMarker (V_MARKER_POS,V_MARKER_COLOR,MARKER_WIDTH);
    }
 
+   
    //Setup Legend:
    if(legend_flg)
    {
@@ -5293,6 +5295,7 @@ void __fastcall TEasyPlotForm::SelPrevBtnClick(TObject *Sender)
 
 }
 //---------------------------------------------------------------------------
+
 
 
 
